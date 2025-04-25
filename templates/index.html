@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="{{ url_for('static', filename='main.js') }}"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-white shadow py-4">
+        <div class="container mx-auto flex justify-between items-center px-4">
+            <h1 class="text-xl font-bold">📝 Simple Blog</h1>
+            <div>
+                <span class="mr-4">Hello, <strong>{{username}}</strong></span>
+                <a href="{{url_for('logout')}}" class="text-blue-500 hover:text-blue-700">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-8 px-4">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-semibold">Recent Posts</h2>
+            <a href="/new_post" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+                New Post
+            </a>
+        </div>
+
+        <div id="posts" class="space-y-4"></div>
+    </div>
+</body>
+</html>
