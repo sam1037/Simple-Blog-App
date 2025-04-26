@@ -35,6 +35,25 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
 
+# User registration
+@app.route('/register', methods=['GET', "POST"])
+def register():
+    if request.method == "POST":
+        # get sent username and pw, check unique username
+        username = request.form['username']
+        pw = request.form["password"]
+        users_json = load_json("users.json")
+        # if duplicate
+        for user in users_json:
+            if user["username"] == username:
+                return render_template("register.html", error = "Username has already been used!")
+        # if unique username
+        users_json.append({"username": username, "password": pw})
+        save_json("users.json", users_json)
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
 # Blog index
 @app.route('/index')
 def index():

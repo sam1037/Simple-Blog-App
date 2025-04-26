@@ -1,4 +1,10 @@
 [
-    {"username": "test", "password": "pw"},
-    {}
+    {
+        "username": "test",
+        "password": "pw"
+    },
+    {
+        "username": "alpha",
+        "password": "pw"
+    }
 ]
