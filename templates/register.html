@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Login - Simple Blog</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body class="bg-gray-100 flex justify-center items-center min-h-screen">
     <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-sm">
@@ -11,12 +12,16 @@
         {% if error %}
         <div class="bg-red-200 text-red-700 p-2 rounded mb-4">{{ error }}</div>
         {% endif %}
+        {% if success %}
+        <div class="bg-green-200 text-green-700 p-2 rounded mb-4">Account registration successful!</div>
+        {% endif %}
         <form method="post">
             <input type="text" name="username" placeholder="Username" required 
                    class="w-full p-2 mb-4 border rounded">
             <input type="password" name="password" placeholder="Password" required 
                    class="w-full p-2 mb-4 border rounded">
             <button class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Register</button>
+            <a href="{{url_for('login')}}" class="text-center block mt-4 text-blue-500 hover:underline">Login</a>
         </form>
     </div>
 </body>

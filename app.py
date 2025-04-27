@@ -47,10 +47,10 @@ def register():
         for user in users_json:
             if user["username"] == username:
                 return render_template("register.html", error = "Username has already been used!")
-        # if unique username
+        # if unique username (ie can register)
         users_json.append({"username": username, "password": pw})
         save_json("users.json", users_json)
-        return redirect(url_for("login"))
+        return render_template("register.html", success=True)
 
     return render_template("register.html")
 
