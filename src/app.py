@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import json, os, datetime
-from database.db_wrapper import check_if_username_exist_in_db, add_user, get_user_by_username
+from database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -63,7 +63,8 @@ def index():
 
 @app.route('/get_posts')
 def get_posts():
-    posts = load_json('posts.json')
+    posts = get_all_posts()
+    #print(posts)
     return jsonify(posts)
 
 # Create new post
@@ -74,14 +75,9 @@ def new_post():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        posts = load_json('posts.json')
-        posts.insert(0, {
-            'author': session['username'],
-            'title': title,
-            'content': content,
-            'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        })
-        save_json('posts.json', posts)
+        author = session['username']
+        # insert post to db
+        insert_new_post(author, title, content)
         return redirect(url_for('index'))
     return render_template('new_post.html')
 

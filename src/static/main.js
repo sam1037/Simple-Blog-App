@@ -12,7 +12,7 @@ async function fetchPosts() {
         curDiv.className = "bg-white p-4 rounded shadow-sm"
         curDiv.innerHTML = `
             <h3 class="text-xl font-bold mb-2">${post.title}</h3>
-            <div class="text-sm text-gray-500 mb-2">By ${post.author} <span style="float: right;">${post.date}</span></div>
+            <div class="text-sm text-gray-500 mb-2">By ${post.author} <span style="float: right;">${post.date_posted}</span></div>
             <p class="text-gray-700 whitespace-pre-wrap">${post.content}</p>
         `
 

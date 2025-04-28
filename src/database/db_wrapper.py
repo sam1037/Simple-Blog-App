@@ -1,6 +1,8 @@
-# This file act as an layer btw the application logic layer and the actual database
+# This file act as an layer btw the application logic layer and the actual database, so all the queries happen here
 
 from database.db import db_pool
+from psycopg2.extras import RealDictCursor
+import pytz
 
 # add user give username and pw
 def add_user(username, password):
@@ -23,7 +25,6 @@ def check_if_username_exist_in_db(username):
         with conn.cursor() as cursor:
             cursor.execute(query, (username,))
             res = cursor.fetchone()
-            #print(res, type(res), len(res))
             return res is not None
     except Exception as e:
         print(f"Error checking if username taken: {e}");
@@ -39,10 +40,52 @@ def get_user_by_username(username):
         with conn.cursor() as cursor:
             cursor.execute(query, (username,))
             res = cursor.fetchone()
-            #print(res, type(res), len(res))
             return res
     except Exception as e:
-        print(f"Error occurred when getting user by username: {e}")
+        print(f"Error occured when getting user by username: {e}")
     finally:
         db_pool.putconn(conn)
     return None
+
+def get_all_posts():
+    """
+    get all the posts, sort by date from newest to oldest
+    """
+    conn = db_pool.getconn()
+    query = "SELECT * FROM posts ORDER BY date_posted DESC;"
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query)
+            res = cursor.fetchall()
+            # handle the res, add local time
+            hk_timezone = pytz.timezone('Asia/Hong_Kong')
+            for post in res:
+                utc_time = post['date_posted']
+                hk_time = utc_time.replace(tzinfo=pytz.utc).astimezone(hk_timezone)
+                post['date_posted'] = hk_time.strftime('%Y-%m-%d %H:%M') 
+                print(hk_time)
+
+            print(res)
+            return res
+    except Exception as e:
+        print(f"Error occured when getting all posts from db: {e}")
+    finally:
+        db_pool.putconn(conn)
+    
+def insert_new_post(author, title, content):
+    """
+    insert a new post to db, return a Boolean indicating successful or not
+    """
+    conn = db_pool.getconn()
+    query = "INSERT INTO posts(author, title, content) VALUES (%s, %s, %s);"
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(query, (author, title, content))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error occured when inserting new post to db: {e}")
+        conn.rollback()
+        return False
+    finally:
+        db_pool.putconn(conn)
