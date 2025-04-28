@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import json, os, datetime
+from database.db_wrapper import check_if_username_exist_in_db, add_user, get_user_by_username
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -19,14 +20,15 @@ def save_json(filename, data):
 @app.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
-        # get sent username and pw, verify
+        # get sent username and pw
         username = request.form['username']
         pw = request.form["password"]
-        users_json = load_json("users.json")
-        for user in users_json:
-            if user['username'] == username and user['password'] == pw:
-                session['username'] = username
-                return redirect(url_for('index'))
+        # verify username and pw
+        user_retrieved = get_user_by_username(username)
+        print(user_retrieved)
+        if user_retrieved and user_retrieved[2] == pw: #how to make this not hardcode
+            session['username'] = username
+            return redirect(url_for('index'))
         return render_template("login.html", error="Login Error!")
     return render_template("login.html")
 
@@ -42,15 +44,13 @@ def register():
         # get sent username and pw, check unique username
         username = request.form['username']
         pw = request.form["password"]
-        users_json = load_json("users.json")
-        # if duplicate
-        for user in users_json:
-            if user["username"] == username:
-                return render_template("register.html", error = "Username has already been used!")
-        # if unique username (ie can register)
-        users_json.append({"username": username, "password": pw})
-        save_json("users.json", users_json)
-        return render_template("register.html", success=True)
+        # check if username valid, if valid add user else show error
+        res = get_user_by_username(username)
+        print(f"res: {res}")
+        if get_user_by_username(username) is None:
+            add_user(username, pw)
+            return render_template("register.html", success=True)
+        return render_template("register.html", error="Username already taken!")        
 
     return render_template("register.html")
 
