@@ -49,7 +49,7 @@ def get_user_by_username(username):
 
 def get_all_posts():
     """
-    get all the posts, sort by date from newest to oldest
+    get all the posts as a dictionary, sort by date from newest to oldest
     """
     conn = db_pool.getconn()
     query = "SELECT * FROM posts ORDER BY date_posted DESC;"
@@ -85,6 +85,41 @@ def insert_new_post(author, title, content):
         return True
     except Exception as e:
         print(f"Error occured when inserting new post to db: {e}")
+        conn.rollback()
+        return False
+    finally:
+        db_pool.putconn(conn)
+
+def get_post_by_id(post_id):
+    """
+    get a post by post_id, return a dictionary representing the post, or None if cannot find it
+    """
+    conn = db_pool.getconn()
+    query = "SELECT * FROM posts WHERE post_id = %s;"
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (post_id,))
+            res = cursor.fetchone()
+            return res
+    except Exception as e:
+        print(f"Error occured when getting post by post_id: {e}")
+    finally:
+        db_pool.putconn(conn)
+    return None
+
+def delete_post_by_id(post_id):
+    """
+    Delete a post given the post id, returns a Boolean indicating successful or not
+    """
+    conn = db_pool.getconn()
+    query = "DELETE FROM posts WHERE post_id = %s;"
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(query, (post_id,))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error occured during deletion of a post by post id: {e}")
         conn.rollback()
         return False
     finally:

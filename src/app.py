@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import json, os, datetime
-from database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post
+from database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post, delete_post_by_id, get_post_by_id
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -80,6 +80,27 @@ def new_post():
         insert_new_post(author, title, content)
         return redirect(url_for('index'))
     return render_template('new_post.html')
+
+# Delete a post by post id
+@app.route('/delete_post/<post_id>', methods=['DELETE'])
+def delete_post(post_id):
+    # Verify if is author deleting his post
+    username = session.get('username')
+    if not username:
+        return jsonify({'message': 'Unauthorized'}), 401
+
+    post = get_post_by_id(post_id)
+    if not post:
+        return jsonify({'message': 'Post not found'}), 404
+
+    if post['author'] != username:
+        return jsonify({'message': 'You are not authorized to delete this post'}), 403
+
+    # Delete it
+    if delete_post_by_id(post_id):
+        return jsonify({'message': 'Post deleted successfully.'})
+    return jsonify({'message': 'Error occured during post deletion'}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)
