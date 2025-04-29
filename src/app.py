@@ -68,8 +68,8 @@ def get_posts():
     return jsonify(posts)
 
 # Create new post
-@app.route('/new_post', methods=['GET', 'POST'])
-def new_post():
+@app.route('/write_post', methods=['GET', 'POST'])
+def write_post():
     if 'username' not in session:
         return redirect(url_for('login'))
     if request.method == 'POST':
@@ -79,7 +79,7 @@ def new_post():
         # insert post to db
         insert_new_post(author, title, content)
         return redirect(url_for('index'))
-    return render_template('new_post.html')
+    return render_template('write_post.html')
 
 # Delete a post by post id
 @app.route('/delete_post/<post_id>', methods=['DELETE'])
@@ -100,6 +100,7 @@ def delete_post(post_id):
     if delete_post_by_id(post_id):
         return jsonify({'message': 'Post deleted successfully.'})
     return jsonify({'message': 'Error occured during post deletion'}), 404
+    
 
 
 if __name__ == '__main__':

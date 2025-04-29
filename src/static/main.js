@@ -13,7 +13,10 @@ async function fetchPosts() {
         curDiv.innerHTML = `
             <div class="flex justify-between items-start mb-1">
                 <h3 class="text-xl font-bold">${post.title}</h3>
-                <button id="deleteBtn" class="ml-2 px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 delete-button" data-post-id="${post.post_id}">Delete</button>
+                <div class="flex">
+                    <button id="editBtn" class="ml-2 px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 edit-button" data-post-id="${post.post_id}">Edit</button>
+                    <button id="deleteBtn" class="ml-2 px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 delete-button" data-post-id="${post.post_id}">Delete</button>
+                </div>
             </div>
             <div class="text-sm text-gray-500 mb-2">By ${post.author} <span style="float: right;">${post.date_posted}</span></div>
             <p class="text-gray-700 whitespace-pre-wrap">${post.content}</p>
@@ -43,6 +46,17 @@ async function fetchPosts() {
             }
         });
     });
+
+    // event listeners for edit btns
+    const editBtns = document.querySelectorAll('.edit-button');
+    editBtns.forEach(btn => {
+        btn.addEventListener('click', async(event)=> {
+            const postId = btn.dataset.postId;
+            console.log(`TODO edit a post with postID: ${postId}`);
+            // const response = await fetch(`/edit_post/${postId}`, { method: 'PUT', }); // ??? Diff btw this and the fetch(...).then style?
+            // TODO
+        })
+    })
 }
 
 document.addEventListener("DOMContentLoaded", fetchPosts);
