@@ -1,12 +1,7 @@
-This project is by following tutorial 8 of CSCI3100, for learning full stack development.
-
-Tech stack: JS, Python (Flask)
-
-Maybe extense: postgreSQL, React
-
-Start date: 23-04-25 (WED)
-
 ## Overview
+This project for learning full stack development.
+
+Start date: 23-04-2025 (WED)
 
 ## Features
 - Login/ logout
@@ -17,5 +12,4 @@ Start date: 23-04-25 (WED)
 - Delete a post
 
 ## Implementation
-
-## Acknowledgement
+Tech stack: JS, Python, Flask, Tailwind CSS, pytest, PostgreSQL, neon
