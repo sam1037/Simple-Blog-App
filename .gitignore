@@ -2,3 +2,4 @@ testFlask.py
 .env
 __pycache__/
 test_hello.py
+.vscode/
