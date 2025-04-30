@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import json, os, datetime
-from database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post, delete_post_by_id, get_post_by_id
+# the below line is probably bad practice, will fix later, do i need a class? do i just import all?
+from database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post, delete_post_by_id, get_post_by_id, edit_post_by_id 
 
 app = Flask(__name__)
 app.secret_key = 'secret'
@@ -80,6 +81,38 @@ def write_post():
         insert_new_post(author, title, content)
         return redirect(url_for('index'))
     return render_template('write_post.html')
+
+# Edit an exisiting post
+@app.route('/edit_post/<post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    # check username login (authentication)
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    # get the post by post id first and check if valid post id
+    post = get_post_by_id(post_id)
+    print(f"editing this post: {post}")
+    print(f"method: {request.method}")
+    if not post:
+        return jsonify({'message': 'Some error occured when trying to retrieve the post'}), 403
+    
+    # check if user if authorized
+    if session.get('username') != post['author']: 
+        return jsonify({'message': 'You are not authorized to edit this post'}), 403
+
+    # GET route: verify, redirect to the write post page with some fields filled
+    if request.method == 'GET':
+        # ??? should I use redirect or render template in this line???
+        return render_template('write_post.html', title=post['title'], text_content=post['content'])
+
+    # POST route: verify, save edit to the db
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        edit_post_by_id(post_id, title=title, content=content)
+        return redirect(url_for('index')) #??? redirect or render template here ???
+
+    return render_template('index.html') #??? redirect or render template here ???
 
 # Delete a post by post id
 @app.route('/delete_post/<post_id>', methods=['DELETE'])

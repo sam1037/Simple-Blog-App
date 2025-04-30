@@ -11,10 +11,10 @@ Start date: 23-04-25 (WED)
 ## Features
 - Login/ logout
 - Registration
-- View existing posts
 - Creat a post
+- Read existing posts
+- Update a post (TODO)
 - Delete a post
-- Edit a post (TODO)
 
 ## Implementation
 

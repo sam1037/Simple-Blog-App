@@ -11,10 +11,10 @@
         <div class="bg-white shadow-lg rounded-lg p-8">
             <h2 class="text-2xl font-semibold mb-6">✍️ Create a New Post</h2>
             <form method="post">
-                <input type="text" name="title" placeholder="Post Title" required 
+                <input type="text" name="title" placeholder="Post Title" value="{{title}}" required 
                        class="w-full p-2 mb-4 border rounded">
                 <textarea name="content" rows="6" placeholder="Write your content here..." required 
-                          class="w-full p-2 mb-4 border rounded"></textarea>
+                          class="w-full p-2 mb-4 border rounded">{{text_content}}</textarea>
                 <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded">
                     Publish
                 </button>

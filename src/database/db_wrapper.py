@@ -90,6 +90,25 @@ def insert_new_post(author, title, content):
     finally:
         db_pool.putconn(conn)
 
+def edit_post_by_id(post_id, title, content):
+    """
+    update a post by post id, return a boolean indicating successful or not
+    """
+    conn = db_pool.getconn()
+    query = "UPDATE posts SET title=%s, content=%s WHERE post_id = %s;"
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(query, (title, content, post_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error occured when inserting new post to db: {e}")
+        conn.rollback()
+        return False
+    finally:
+        db_pool.putconn(conn)
+
+
 def get_post_by_id(post_id):
     """
     get a post by post_id, return a dictionary representing the post, or None if cannot find it

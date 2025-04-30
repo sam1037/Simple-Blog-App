@@ -50,11 +50,18 @@ async function fetchPosts() {
     // event listeners for edit btns
     const editBtns = document.querySelectorAll('.edit-button');
     editBtns.forEach(btn => {
-        btn.addEventListener('click', async(event)=> {
+        btn.addEventListener('click', async()=> {
             const postId = btn.dataset.postId;
             console.log(`TODO edit a post with postID: ${postId}`);
-            // const response = await fetch(`/edit_post/${postId}`, { method: 'PUT', }); // ??? Diff btw this and the fetch(...).then style?
-            // TODO
+            
+
+            const response = await fetch(`/edit_post/${postId}`, { method: 'GET', }); // ??? Diff btw this and the fetch(...).then functional programming style?
+            if (response.ok) {
+                window.location.href = `/edit_post/${postId}`
+            } else {
+                const errorData = await response.text()
+                alert(errorData.message || 'You are not authorized to edit this post.');
+            }
         })
     })
 }

@@ -37,6 +37,10 @@ def drop_all():
     finally:
         db_pool.putconn(conn)
 
+# TODO
+def seed_db():
+    print("TODO")
+
 # create the tables if don't exist, seed the data if any
 def init_db():
     conn = db_pool.getconn()
