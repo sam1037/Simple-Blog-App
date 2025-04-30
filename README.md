@@ -8,8 +8,8 @@ Start date: 23-04-2025 (WED)
 - Registration
 - Creat a post
 - Read existing posts
-- Update a post (TODO)
+- Update a post
 - Delete a post
 
 ## Implementation
-Tech stack: JS, Python, Flask, Tailwind CSS, pytest, PostgreSQL, neon
+Tech stack: JS, Python, Flask, Tailwind CSS, pytest, PostgreSQL, neon (PostgreSQL cloud platform)
