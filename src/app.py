@@ -1,10 +1,10 @@
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import json, os, datetime
 # the below line is probably bad practice, will fix later, do i need a class? do i just import all?
-from database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post, delete_post_by_id, get_post_by_id, edit_post_by_id 
+from src.database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post, delete_post_by_id, get_post_by_id, edit_post_by_id 
 
-app = Flask(__name__)
-app.secret_key = 'secret'
+app = Flask(__name__) #???
+app.secret_key = 'secret' #???
 
 # Helper functions
 def load_json(filename):
@@ -137,4 +137,4 @@ def delete_post(post_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True) #???

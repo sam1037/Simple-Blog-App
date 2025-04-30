@@ -1,6 +1,6 @@
 # This file act as an layer btw the application logic layer and the actual database, so all the queries happen here
 
-from database.db import db_pool
+from src.database.db import db_pool
 from psycopg2.extras import RealDictCursor
 import pytz
 
