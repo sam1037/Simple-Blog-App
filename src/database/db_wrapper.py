@@ -4,8 +4,10 @@ from src.database.db import db_pool
 from psycopg2.extras import RealDictCursor
 import pytz
 
-# add user give username and pw
-def add_user(username, password):
+def add_user(username: str, password: str) -> None:
+    """
+    add user to the db give username and pw
+    """
     conn = db_pool.getconn()
     query = "INSERT INTO users(username, password) VALUES (%s, %s);"  
     try:
@@ -18,7 +20,10 @@ def add_user(username, password):
     finally:
         db_pool.putconn(conn)
 
-def check_if_username_exist_in_db(username):
+def check_if_username_exist_in_db(username: str) -> bool:
+    """
+    check if username exist in db, returns a bool indicating the result
+    """
     conn = db_pool.getconn()
     query = "SELECT 1 FROM users WHERE username = %s;"  
     try:
@@ -28,12 +33,16 @@ def check_if_username_exist_in_db(username):
             return res is not None
     except Exception as e:
         print(f"Error checking if username taken: {e}");
+        return False
     finally:
         db_pool.putconn(conn)
-    return True
+    return False
 
-# get user (username and pw) by username, return None if username not in db
-def get_user_by_username(username):
+# TODO change this to return a dict w/ realdictcursor
+def get_user_by_username(username: str) -> tuple | None:
+    """
+    get user (username and pw) by username, return None if username not in db
+    """
     conn = db_pool.getconn()
     query = "SELECT * FROM users where username = %s;"
     try:
@@ -47,7 +56,7 @@ def get_user_by_username(username):
         db_pool.putconn(conn)
     return None
 
-def get_all_posts():
+def get_all_posts() -> list[dict] | None:
     """
     get all the posts as a dictionary, sort by date from newest to oldest
     """
@@ -72,7 +81,7 @@ def get_all_posts():
     finally:
         db_pool.putconn(conn)
     
-def insert_new_post(author, title, content):
+def insert_new_post(author: str, title: str, content: str) -> bool:
     """
     insert a new post to db, return a Boolean indicating successful or not
     """
@@ -90,7 +99,7 @@ def insert_new_post(author, title, content):
     finally:
         db_pool.putconn(conn)
 
-def edit_post_by_id(post_id, title, content):
+def edit_post_by_id(post_id: int, title: str, content: str) -> bool:
     """
     update a post by post id, return a boolean indicating successful or not
     """
@@ -109,7 +118,7 @@ def edit_post_by_id(post_id, title, content):
         db_pool.putconn(conn)
 
 
-def get_post_by_id(post_id):
+def get_post_by_id(post_id: int) -> dict | None:
     """
     get a post by post_id, return a dictionary representing the post, or None if cannot find it
     """
@@ -126,7 +135,7 @@ def get_post_by_id(post_id):
         db_pool.putconn(conn)
     return None
 
-def delete_post_by_id(post_id):
+def delete_post_by_id(post_id: int) -> bool:
     """
     Delete a post given the post id, returns a Boolean indicating successful or not
     """
