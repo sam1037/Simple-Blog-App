@@ -1,4 +1,4 @@
-# This file act as an layer btw the application logic layer and the actual database, so all the queries happen here
+'''This file act as an layer btw the application logic layer and the actual database, so all the queries happen here'''
 
 from src.database.db import db_pool
 from psycopg2.extras import RealDictCursor

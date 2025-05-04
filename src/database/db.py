@@ -1,4 +1,4 @@
-# This file handles connection to the postgresql database, connect to the db and init the table schemas
+''' This file handles connection to the postgresql database and db table schemas.'''
 
 import psycopg2
 import os
@@ -12,7 +12,8 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 # Create the pool ONCE at the module level
 db_pool = psycopg2.pool.SimpleConnectionPool(1, 10, DATABASE_URL)
 
-def test_db_connection():
+def test_db_connection() -> None:
+    '''test if the db is connected or not, print "DB connection good" if connected.'''
     conn = db_pool.getconn()
     try:
         with conn.cursor() as cursor:
@@ -26,8 +27,8 @@ def test_db_connection():
 def end_db_connection():
     db_pool.closeall()
 
-# clear all data and drop all tables
-def drop_all():
+def drop_all() -> None:
+    '''Drop all data and tables'''
     conn = db_pool.getconn()
     try:
         with conn.cursor() as cursor:
@@ -41,8 +42,8 @@ def drop_all():
 def seed_db():
     print("TODO")
 
-# create the tables if don't exist, seed the data if any
-def init_db():
+def init_db() -> None:
+    '''create the tables if don't exist, seed the data if any'''
     conn = db_pool.getconn()
     try: 
         with conn.cursor() as cursor:
