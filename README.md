@@ -1,5 +1,5 @@
 ## Overview
-This project for learning full stack development.
+This project is for learning full stack development.
 
 Start date: 23-04-2025 (WED)
 
