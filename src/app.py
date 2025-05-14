@@ -27,7 +27,7 @@ def login():
         # verify username and pw
         user_retrieved = get_user_by_username(username)
         print(user_retrieved)
-        if user_retrieved and user_retrieved[2] == pw: #how to make this not hardcode
+        if user_retrieved and user_retrieved["password"] == pw: #how to make this not hardcode
             session['username'] = username
             return redirect(url_for('index'))
         return render_template("login.html", error="Login Error!")

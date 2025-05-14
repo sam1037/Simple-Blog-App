@@ -3,6 +3,8 @@
 from src.database.db import db_pool
 from psycopg2.extras import RealDictCursor
 import pytz
+from typing import TypedDict
+from src.database.models import User, Post
 
 def add_user(username: str, password: str) -> None:
     """
@@ -38,15 +40,14 @@ def check_if_username_exist_in_db(username: str) -> bool:
         db_pool.putconn(conn)
     return False
 
-# TODO change this to return a dict w/ realdictcursor
-def get_user_by_username(username: str) -> tuple | None:
+def get_user_by_username(username: str) -> User | None:
     """
     get user (username and pw) by username, return None if username not in db
     """
     conn = db_pool.getconn()
     query = "SELECT * FROM users where username = %s;"
     try:
-        with conn.cursor() as cursor:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(query, (username,))
             res = cursor.fetchone()
             return res
@@ -56,7 +57,7 @@ def get_user_by_username(username: str) -> tuple | None:
         db_pool.putconn(conn)
     return None
 
-def get_all_posts() -> list[dict] | None:
+def get_all_posts() -> list[Post] | None:
     """
     get all the posts as a dictionary, sort by date from newest to oldest
     """
@@ -118,7 +119,7 @@ def edit_post_by_id(post_id: int, title: str, content: str) -> bool:
         db_pool.putconn(conn)
 
 
-def get_post_by_id(post_id: int) -> dict | None:
+def get_post_by_id(post_id: int) -> Post | None:
     """
     get a post by post_id, return a dictionary representing the post, or None if cannot find it
     """
