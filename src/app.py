@@ -133,8 +133,6 @@ def delete_post(post_id):
     if delete_post_by_id(post_id):
         return jsonify({'message': 'Post deleted successfully.'})
     return jsonify({'message': 'Error occured during post deletion'}), 404
-    
-
 
 if __name__ == '__main__':
     app.run(debug=True) #???
