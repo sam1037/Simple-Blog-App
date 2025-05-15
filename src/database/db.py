@@ -10,7 +10,7 @@ load_dotenv()
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 # Create the pool ONCE at the module level
-db_pool = psycopg2.pool.SimpleConnectionPool(1, 10, DATABASE_URL)
+db_pool = pool.SimpleConnectionPool(1, 10, DATABASE_URL)
 
 def test_db_connection() -> None:
     '''test if the db is connected or not, print "DB connection good" if connected.'''
@@ -47,7 +47,7 @@ def init_db() -> None:
     conn = db_pool.getconn()
     try: 
         with conn.cursor() as cursor:
-            with open('database/schema.sql', 'r') as f:
+            with open('src/database/schema.sql', 'r') as f:
                 sql = f.read()
                 cursor.execute(sql)  # For single statement or small scripts
         conn.commit()
@@ -57,5 +57,6 @@ def init_db() -> None:
 # init the db
 if __name__ == "__main__":
     conn = db_pool.getconn()
-    #init_db()
+    init_db()
+    end_db_connection()
     #add_user("test", "pw")

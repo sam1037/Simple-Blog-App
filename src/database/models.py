@@ -9,11 +9,11 @@ class User(TypedDict):
 
     - user_id: int
     - username: str
-    - password: str
+    - hashed_pw: str
     """
     user_id: int
     username: str
-    password: str
+    hashed_pw: str
 
 class Post(TypedDict):
     """

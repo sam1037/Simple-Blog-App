@@ -1,5 +1,8 @@
+"""The main Flask app"""
+
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 import json, os, datetime
+from passlib.hash import bcrypt
 # the below line is probably bad practice, will fix later, do i need a class? do i just import all?
 from src.database.db_wrapper import add_user, get_user_by_username, get_all_posts, insert_new_post, delete_post_by_id, get_post_by_id, edit_post_by_id 
 
@@ -22,13 +25,12 @@ def save_json(filename, data):
 def login():
     if request.method == "POST":
         # get sent username and pw
-        username = request.form['username']
-        pw = request.form["password"]
+        input_username = request.form['username']
+        input_pw = request.form["password"]
         # verify username and pw
-        user_retrieved = get_user_by_username(username)
-        print(user_retrieved)
-        if user_retrieved and user_retrieved["password"] == pw: #how to make this not hardcode
-            session['username'] = username
+        user_retrieved = get_user_by_username(input_username)
+        if user_retrieved and bcrypt.verify(input_pw, user_retrieved.get('hashed_pw')):
+            session['username'] = input_username
             return redirect(url_for('index'))
         return render_template("login.html", error="Login Error!")
     return render_template("login.html")
