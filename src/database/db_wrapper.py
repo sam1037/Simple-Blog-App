@@ -5,16 +5,19 @@ from psycopg2.extras import RealDictCursor
 import pytz
 from typing import TypedDict
 from src.database.models import User, Post
+from passlib.hash import bcrypt
 
 def add_user(username: str, password: str) -> None:
     """
     add user to the db give username and pw
     """
+    hashed_pw = bcrypt.hash(password)
+
     conn = db_pool.getconn()
-    query = "INSERT INTO users(username, password) VALUES (%s, %s);"  
+    query = "INSERT INTO users(username, hashed_pw) VALUES (%s, %s);"  
     try:
         with conn.cursor() as cursor:
-            cursor.execute(query, (username, password))
+            cursor.execute(query, (username, hashed_pw))
         conn.commit()
     except Exception as e:
         conn.rollback()
