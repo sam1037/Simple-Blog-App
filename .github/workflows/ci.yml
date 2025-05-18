@@ -46,6 +46,6 @@ jobs:
 
     - name: Run tests with pytest
       env: 
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/blog_test
+        SECRET_KEY: ${{ secrets.SECRET_KEY || 'dev_secret_key'}}
       run: uv run -m pytest # Execute your pytest tests
