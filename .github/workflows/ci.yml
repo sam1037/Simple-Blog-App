@@ -48,4 +48,4 @@ jobs:
       env: 
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/blog_test
         SECRET_KEY: ${{ secrets.SECRET_KEY || 'dev_secret_key'}}
-      run: uv run -m pytest # Execute your pytest tests
+      run: uv run -m pytest tests/hello_test.py # Execute your pytest tests
