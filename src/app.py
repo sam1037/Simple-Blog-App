@@ -32,7 +32,7 @@ def login():
         if user_retrieved and bcrypt.verify(input_pw, user_retrieved.get('hashed_pw')):
             session['username'] = input_username
             return redirect(url_for('index'))
-        return render_template("login.html", error="Login Error!")
+        return render_template("login.html", error="Login Error!"), 400
     return render_template("login.html")
 
 @app.route('/logout')
@@ -53,7 +53,7 @@ def register():
         if db_wrapper.get_user_by_username(username) is None:
             db_wrapper.add_user(username, pw)
             return render_template("register.html", success=True)
-        return render_template("register.html", error="Username already taken!")        
+        return render_template("register.html", error="Username already taken!"), 400
 
     return render_template("register.html")
 
@@ -61,11 +61,12 @@ def register():
 @app.route('/index')
 def index():
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('login')), 400
     return render_template('index.html', username=session['username'])
 
 @app.route('/get_posts')
 def get_posts():
+    # ? need to check authorized ?
     posts = db_wrapper.get_all_posts()
     #print(posts)
     return jsonify(posts)
@@ -89,7 +90,7 @@ def write_post():
 def edit_post(post_id):
     # check username login (authentication)
     if 'username' not in session:
-        return redirect(url_for('login'))
+        return redirect(url_for('login')), 400
     
     # get the post by post id first and check if valid post id
     post = db_wrapper.get_post_by_id(post_id)

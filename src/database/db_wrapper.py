@@ -45,7 +45,7 @@ def check_if_username_exist_in_db(username: str) -> bool:
 
 def get_user_by_username(username: str) -> User | None:
     """
-    get user (username and pw) by username, return None if username not in db
+    get user (id, username and pw) by username, return None if username not in db
     """
     conn = db_pool.getconn()
     query = "SELECT * FROM users where username = %s;"
@@ -152,6 +152,24 @@ def delete_post_by_id(post_id: int) -> bool:
         return True
     except Exception as e:
         print(f"Error occured during deletion of a post by post id: {e}")
+        conn.rollback()
+        return False
+    finally:
+        db_pool.putconn(conn)
+
+def delete_user_by_id(user_id: int) -> bool:
+    """
+    delete a user from db given the user id, returns a boolean indicating successful or not
+    """
+    conn = db_pool.getconn()
+    query = "DELETE FROM users WHERE user_id = %s;"
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(query, (user_id,))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error occured during deletion of a user by user id: {e}")
         conn.rollback()
         return False
     finally:
