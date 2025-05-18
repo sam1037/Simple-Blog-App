@@ -1,0 +1,31 @@
+# .github/workflows/ci.yml
+
+name: CI
+
+on:
+  push:
+    branches: [ main, master ] # Trigger on push to main or master branch
+  pull_request:
+    branches: [ main, master ] # Trigger on pull requests targeting main or master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest # Run on a fresh Ubuntu virtual machine
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4 # Action to checkout your repository code
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' # Specify the Python version you want to use (e.g., '3.9', '3.10', '3.x')
+
+    - name: Install uv
+      run: pip install uv # Install uv globally or in a dedicated venv if preferred
+
+    - name: Install dependencies with uv
+      run: uv sync # Use uv sync to install dependencies based on pyproject.toml or requirements.txt
+
+    - name: Run tests with pytest
+      run: uv run -m pytest # Execute your pytest tests
