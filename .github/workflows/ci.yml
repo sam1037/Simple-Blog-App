@@ -44,6 +44,11 @@ jobs:
     - name: Install dependencies with uv
       run: uv sync # Use uv sync to install dependencies based on pyproject.toml or requirements.txt
 
+    - name: Initialize database schema
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/blog_test
+      run: uv run python -c "from src.database.db import init_db; init_db()"
+      
     - name: Run tests with pytest
       env: 
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/blog_test
