@@ -4,9 +4,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ] # Trigger on push to main or master branch
+    branches: [ main, github_actions ] # Trigger on push to main or master branch
   pull_request:
-    branches: [ main, master ] # Trigger on pull requests targeting main or master
+    branches: [ main, github_actions ] # Trigger on pull requests targeting main or master
 
 jobs:
   build-and-test:
@@ -17,9 +17,9 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: ${{ secrets.PG_USER || 'postgres' }}
-          POSTGRES_PASSWORD: ${{ secrets.PG_PASSWORD || 'postgres' }}
-          POSTGRES_DB: ${{ secrets.PG_DATABASE || 'blog_test' }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: blog_test
         ports:
           - 5432:5432
         options: >-
@@ -44,8 +44,13 @@ jobs:
     - name: Install dependencies with uv
       run: uv sync # Use uv sync to install dependencies based on pyproject.toml or requirements.txt
 
+    - name: Initialize database schema
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/blog_test
+      run: uv run python -c "from src.database.db import init_db; init_db()"
+      
     - name: Run tests with pytest
       env: 
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      run: uv run -m pytest # Execute your pytest tests
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/blog_test
+        SECRET_KEY: ${{ secrets.SECRET_KEY || 'dev_secret_key'}}
+      run: uv run -m pytest tests/hello_test.py # Execute your pytest tests
