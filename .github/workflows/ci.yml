@@ -12,6 +12,22 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest # Run on a fresh Ubuntu virtual machine
 
+    # Add PostgreSQL service
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: ${{ secrets.PG_USER || 'postgres' }}
+          POSTGRES_PASSWORD: ${{ secrets.PG_PASSWORD || 'postgres' }}
+          POSTGRES_DB: ${{ secrets.PG_DATABASE || 'blog_test' }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4 # Action to checkout your repository code
@@ -19,6 +35,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
+        # TODO how to fix this hardcoded python version
         python-version: '3.10' # Specify the Python version you want to use (e.g., '3.9', '3.10', '3.x')
 
     - name: Install uv
