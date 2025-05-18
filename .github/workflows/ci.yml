@@ -5,6 +5,7 @@ name: CI
 on:
   push:
     branches: [ main, github_actions ] # Trigger on push to main or master branch
+    # todo only if change in /src dir or /tests dir
   pull_request:
     branches: [ main, github_actions ] # Trigger on pull requests targeting main or master
 

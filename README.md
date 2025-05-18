@@ -1,22 +1,24 @@
 # Simple Blog App
 
 ## Overview
-This project is for learning full stack development.
+Check it out [here](https://simple-blog-app-production.up.railway.app/)!
+(use username `test` and password `pw`).
 
-Start date: 23-04-2025 (WED)
+This is a Flask-based web application that implements a simple blog system with the following features:
 
-## Features
-- Login/ logout
-- Registration
-- Creat a post
-- Read existing posts
-- Update a post
-- Delete a post
+- User authentication (login/logout and registration)
+- Create, read, update, and delete blog posts (CRUD operations)
+- PostgreSQL database for data storage
+
+## Tech Stack
+- Frontend: HTML/JS/CSS, Tailwind CSS
+- Backend: Python, Flask
+- Database: PostgreSQL (hosted on Neon cloud platform)
+- Testing: pytest
+- Package Management: uv
+- Tools: GitHub Actions, Railway (hosting), Neon
 
 ## Commands
-`uv sync`: download the required packages
-`uv run -m src.app`: run the Flask app
-`uv run -m pytest`: run the tests
-
-## Implementation
-Tech stack: JS, Python, Flask, Tailwind CSS, pytest, PostgreSQL, neon (PostgreSQL cloud platform)
+- `uv sync`: download the required packages
+- `uv run -m src.app`: run the Flask app
+- `uv run -m pytest`: run the tests
