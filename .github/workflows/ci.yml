@@ -28,4 +28,7 @@ jobs:
       run: uv sync # Use uv sync to install dependencies based on pyproject.toml or requirements.txt
 
     - name: Run tests with pytest
+      env: 
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        SECRET_KEY: ${{ secrets.SECRET_KEY }}
       run: uv run -m pytest # Execute your pytest tests
