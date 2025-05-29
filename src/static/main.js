@@ -54,7 +54,7 @@ async function fetchPosts() {
             const postId = btn.dataset.postId;
             console.log(`TODO edit a post with postID: ${postId}`);
             
-            
+
             const response = await fetch(`/edit_post/${postId}`, { method: 'GET', }); // ??? Diff btw this and the fetch(...).then functional programming style?
             if (response.ok) {
                 window.location.href = `/edit_post/${postId}`

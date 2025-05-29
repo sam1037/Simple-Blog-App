@@ -4,12 +4,10 @@ from flask import Flask, request, render_template, redirect, url_for, session, j
 import json, os
 from passlib.hash import bcrypt
 import src.database.db_wrapper as db_wrapper
-import logging
 
 app = Flask(__name__) 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 app.secret_key = SECRET_KEY 
-app.logger.setLevel(logging.DEBUG)
 
 # Helper functions
 def load_json(filename):
@@ -51,7 +49,7 @@ def register():
         pw = request.form["password"]
         # check if username valid, if valid add user else show error
         res = db_wrapper.get_user_by_username(username)
-        app.logger.debug(f"Registration attempt for username: {username}, user found: {res}") # Replaced print with app.logger.debug
+        print(f"res: {res}")
         if db_wrapper.get_user_by_username(username) is None:
             db_wrapper.add_user(username, pw)
             return render_template("register.html", success=True)
@@ -69,6 +67,7 @@ def index():
 @app.route('/get_posts')
 def get_posts():
     posts = db_wrapper.get_all_posts()
+    #print(posts)
     return jsonify(posts)
 
 # Create new post
@@ -94,8 +93,8 @@ def edit_post(post_id):
     
     # get the post by post id first and check if valid post id
     post = db_wrapper.get_post_by_id(post_id)
-    app.logger.debug(f"editing this post: {post}")
-    app.logger.debug(f"method: {request.method}")
+    print(f"editing this post: {post}")
+    print(f"method: {request.method}")
     if not post:
         return jsonify({'message': 'Some error occured when trying to retrieve the post'}), 403
     
