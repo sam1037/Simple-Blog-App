@@ -14,6 +14,7 @@ testFlask.py
 .env
 test_hello.py
 .vscode/
+testopneapi.yml
 
 # Ignore all files starting with hello
 hello*
