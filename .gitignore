@@ -17,3 +17,6 @@ test_hello.py
 
 # Ignore all files starting with hello
 hello*
+
+# misc
+testopneapi.yml

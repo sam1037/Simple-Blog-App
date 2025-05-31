@@ -6,6 +6,9 @@ import pytz
 from typing import TypedDict
 from src.database.models import User, Post
 from passlib.hash import bcrypt
+import logging
+
+my_logger = logging.getLogger("my_flask_logger")
 
 def add_user(username: str, password: str) -> None:
     """
@@ -21,7 +24,7 @@ def add_user(username: str, password: str) -> None:
         conn.commit()
     except Exception as e:
         conn.rollback()
-        print(f"Error adding user: {e}");
+        my_logger.error(f"Error adding user: {e}");
     finally:
         db_pool.putconn(conn)
 
@@ -37,7 +40,7 @@ def check_if_username_exist_in_db(username: str) -> bool:
             res = cursor.fetchone()
             return res is not None
     except Exception as e:
-        print(f"Error checking if username taken: {e}");
+        my_logger.error(f"Error checking if username taken: {e}");
         return False
     finally:
         db_pool.putconn(conn)
@@ -55,7 +58,7 @@ def get_user_by_username(username: str) -> User | None:
             res = cursor.fetchone()
             return res
     except Exception as e:
-        print(f"Error occured when getting user by username: {e}")
+        my_logger.error(f"Error occured when getting user by username: {e}")
     finally:
         db_pool.putconn(conn)
     return None
@@ -76,12 +79,11 @@ def get_all_posts() -> list[Post] | None:
                 utc_time = post['date_posted']
                 hk_time = utc_time.replace(tzinfo=pytz.utc).astimezone(hk_timezone)
                 post['date_posted'] = hk_time.strftime('%Y-%m-%d %H:%M') 
-                print(hk_time)
 
-            print(res)
+            my_logger.debug(res)
             return res
     except Exception as e:
-        print(f"Error occured when getting all posts from db: {e}")
+        my_logger.error(f"Error occured when getting all posts from db: {e}")
     finally:
         db_pool.putconn(conn)
     
@@ -97,7 +99,7 @@ def insert_new_post(author: str, title: str, content: str) -> bool:
         conn.commit()
         return True
     except Exception as e:
-        print(f"Error occured when inserting new post to db: {e}")
+        my_logger.error(f"Error occured when inserting new post to db: {e}")
         conn.rollback()
         return False
     finally:
@@ -115,7 +117,7 @@ def edit_post_by_id(post_id: int, title: str, content: str) -> bool:
         conn.commit()
         return True
     except Exception as e:
-        print(f"Error occured when inserting new post to db: {e}")
+        my_logger.error(f"Error occured when inserting new post to db: {e}")
         conn.rollback()
         return False
     finally:
@@ -134,7 +136,7 @@ def get_post_by_id(post_id: int) -> Post | None:
             res = cursor.fetchone()
             return res
     except Exception as e:
-        print(f"Error occured when getting post by post_id: {e}")
+        my_logger.error(f"Error occured when getting post by post_id: {e}")
     finally:
         db_pool.putconn(conn)
     return None
@@ -151,7 +153,7 @@ def delete_post_by_id(post_id: int) -> bool:
         conn.commit()
         return True
     except Exception as e:
-        print(f"Error occured during deletion of a post by post id: {e}")
+        my_logger.error(f"Error occured during deletion of a post by post id: {e}")
         conn.rollback()
         return False
     finally:
