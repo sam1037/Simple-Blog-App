@@ -79,8 +79,6 @@ def get_all_posts() -> list[Post] | None:
                 utc_time = post['date_posted']
                 hk_time = utc_time.replace(tzinfo=pytz.utc).astimezone(hk_timezone)
                 post['date_posted'] = hk_time.strftime('%Y-%m-%d %H:%M') 
-
-            my_logger.debug(res)
             return res
     except Exception as e:
         my_logger.error(f"Error occured when getting all posts from db: {e}")

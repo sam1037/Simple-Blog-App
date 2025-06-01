@@ -1,11 +1,12 @@
 """The main Flask app"""
 
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, flash
 import json, os
 from passlib.hash import bcrypt
 import src.database.db_wrapper as db_wrapper
 import logging
 import sys
+from functools import wraps
 
 app = Flask(__name__) 
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -34,6 +35,34 @@ def save_json(filename, data):
     with open(filename, 'w') as f:
         json.dump(data, f, indent=4)
 
+def login_required(f):
+    """
+    decorator to ensure the user is login for UI endpoints, else redirect to the login page
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # ensure login, else redirect to the login page
+        if "username" not in session:
+            flash("Login required!", "error")
+            return redirect(url_for("login"))
+        result = f(*args, **kwargs)
+        return result
+    return wrapper
+
+def login_required_api(f):
+    """
+    decorator to ensure the user is login for API endpoints, else return json and 401
+    """
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # ensure login, else redirect to the login page
+        if "username" not in session:
+            return jsonify({'message': 'Login required'}), 401
+        result = f(*args, **kwargs)
+        return result
+    return wrapper
+
+
 # User login/logout
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -46,12 +75,14 @@ def login():
         if user_retrieved and bcrypt.verify(input_pw, user_retrieved.get('hashed_pw')):
             session['username'] = input_username
             return redirect(url_for('index'))
-        return render_template("login.html", error="Login Error!")
+        flash("Login Error!", "error")
+        return render_template("login.html")
     return render_template("login.html")
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    flash("Logout Successful!", "info")
     return redirect(url_for('login'))
 
 # User registration
@@ -66,18 +97,24 @@ def register():
         my_logger.debug(f"res: {res}")
         if db_wrapper.get_user_by_username(username) is None:
             db_wrapper.add_user(username, pw)
-            return render_template("register.html", success=True)
-        return render_template("register.html", error="Username already taken!")        
+            flash("Account Registration Successful!", "info")
+            return render_template("register.html")
+        flash("Username Already Taken!", "error")
+        return render_template("register.html")
 
     return render_template("register.html")
 
 # Blog index
+# TODO rename this, future will serve as public blog section
 @app.route('/index')
 def index():
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    return render_template('index.html', username=session['username'])
+    # render differently depending on viewing as guest or login user
+    if "username" not in session:
+        return render_template('index.html', username="Guest")
+    else:
+        return render_template('index.html', username=session['username'])
 
+# ??? this is actually an API route???
 @app.route('/get_posts')
 def get_posts():
     posts = db_wrapper.get_all_posts()
@@ -85,9 +122,8 @@ def get_posts():
 
 # Create new post
 @app.route('/write_post', methods=['GET', 'POST'])
+@login_required
 def write_post():
-    if 'username' not in session:
-        return redirect(url_for('login'))
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
@@ -99,11 +135,8 @@ def write_post():
 
 # Edit an exisiting post
 @app.route('/edit_post/<post_id>', methods=['GET', 'POST'])
+@login_required
 def edit_post(post_id):
-    # check username login (authentication)
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    
     # get the post by post id first and check if valid post id
     post = db_wrapper.get_post_by_id(post_id)
     my_logger.debug(f"editing this post: {post}")
@@ -130,7 +163,10 @@ def edit_post(post_id):
     return render_template('index.html') #??? redirect or render template here ???
 
 # Delete a post by post id
+# ??? is this like an api route?
+# TODO should i rename this to sth like 'api/posts, following REST?'
 @app.route('/delete_post/<post_id>', methods=['DELETE'])
+@login_required_api
 def delete_post(post_id):
     # Verify if is author deleting his post
     username = session.get('username')

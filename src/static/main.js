@@ -42,6 +42,9 @@ async function fetchPosts() {
                 } else {
                     const errorData = await response.json()
                     alert(errorData.message || 'Failed to delete post.');
+                    if (errorData.message == "Login required"){
+                        window.location.href = `/`
+                    }
                 }
             }
         });
