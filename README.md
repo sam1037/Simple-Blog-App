@@ -7,7 +7,8 @@ Check it out [here](https://simple-blog-app-production.up.railway.app/)!
 This is a Flask-based web application that implements a simple blog system with the following features:
 
 - User authentication (login/logout and registration)
-- Create, read, update, and delete blog posts (CRUD operations)
+- Create, read, update, and delete blog posts as logged-in user (CRUD operations)
+- Guest mode: read blogs without logging in as guest
 - PostgreSQL database for data storage
 
 ## Tech Stack
