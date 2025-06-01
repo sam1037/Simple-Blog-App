@@ -1,11 +1,12 @@
 """The main Flask app"""
 
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, flash
 import json, os
 from passlib.hash import bcrypt
 import src.database.db_wrapper as db_wrapper
 import logging
 import sys
+from functools import wraps
 
 app = Flask(__name__) 
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -34,6 +35,17 @@ def save_json(filename, data):
     with open(filename, 'w') as f:
         json.dump(data, f, indent=4)
 
+def login_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        # ensure login, else redirect to the login page
+        if "username" not in session:
+            flash("Login required!", "error")
+            return redirect(url_for("login"))
+        result = f(*args, **kwargs)
+        return result
+    return wrapper
+
 # User login/logout
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -46,12 +58,14 @@ def login():
         if user_retrieved and bcrypt.verify(input_pw, user_retrieved.get('hashed_pw')):
             session['username'] = input_username
             return redirect(url_for('index'))
-        return render_template("login.html", error="Login Error!")
+        flash("Login Error!", "error")
+        return render_template("login.html")
     return render_template("login.html")
 
 @app.route('/logout')
 def logout():
     session.pop('username', None)
+    flash("Logout Successful!", "info")
     return redirect(url_for('login'))
 
 # User registration
@@ -66,13 +80,16 @@ def register():
         my_logger.debug(f"res: {res}")
         if db_wrapper.get_user_by_username(username) is None:
             db_wrapper.add_user(username, pw)
-            return render_template("register.html", success=True)
-        return render_template("register.html", error="Username already taken!")        
+            flash("Account Registration Successful!", "info")
+            return render_template("register.html")
+        flash("Username Already Taken!", "error")
+        return render_template("register.html")        
 
     return render_template("register.html")
 
 # Blog index
 @app.route('/index')
+@login_required
 def index():
     if 'username' not in session:
         return redirect(url_for('login'))
