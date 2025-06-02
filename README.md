@@ -1,8 +1,7 @@
 # Simple Blog App
 
 ## Overview
-Check it out [here](https://simple-blog-app-production.up.railway.app/)!
-(use username `test` and password `pw`).
+Check it out [here](https://simple-blog-app-production.up.railway.app/)! (You can view as guest or create an account).
 
 This is a Flask-based web application that implements a simple blog system with the following features:
 
