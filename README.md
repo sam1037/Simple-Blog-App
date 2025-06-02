@@ -21,4 +21,5 @@ This is a Flask-based web application that implements a simple blog system with 
 ## Commands
 - `uv sync`: download the required packages
 - `uv run -m src.app`: run the Flask app
+- `uv run flask --app src.app run`: run the Flask app
 - `uv run -m pytest`: run the tests
