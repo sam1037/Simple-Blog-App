@@ -1,0 +1,1 @@
+# maybe i should move things from src.app to here, and rename src to simple-blog-app

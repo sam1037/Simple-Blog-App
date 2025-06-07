@@ -293,6 +293,7 @@ name = "simple-blog-app"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "click" },
     { name = "dotenv" },
     { name = "flask" },
     { name = "gunicorn" },
@@ -304,6 +305,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "click", specifier = ">=8.2.0" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "flask", specifier = ">=3.1.0" },
     { name = "gunicorn", specifier = ">=23.0.0" },
