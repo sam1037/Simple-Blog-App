@@ -6,6 +6,7 @@ import os
 import sys
 from functools import wraps
 
+import click
 from flask import (
     Flask,
     flash,
@@ -35,6 +36,15 @@ if os.environ.get("FLASK_ENV") and os.environ.get("FLASK_ENV") == "dev":
 else:
     console_handler.setLevel(logging.INFO)
 my_logger.addHandler(console_handler)
+
+
+# test cli
+@click.command("hello")
+def hello_cmd():
+    click.echo("hello")
+
+
+app.cli.add_command(hello_cmd)
 
 
 # Helper functions

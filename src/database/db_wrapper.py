@@ -1,6 +1,7 @@
 """This file act as an layer btw the application logic layer and the actual database, so all the queries happen here"""
 
 import logging
+from typing import TypedDict
 
 import pytz
 from passlib.hash import bcrypt
