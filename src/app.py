@@ -41,6 +41,7 @@ my_logger.addHandler(console_handler)
 # test cli
 @click.command("hello")
 def hello_cmd():
+    """A testing cmd that will echo 'hello'"""
     click.echo("hello")
 
 

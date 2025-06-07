@@ -7,12 +7,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from src.database.db_wrapper import (
     add_user,
-    check_if_username_exist_in_db,
-    delete_post_by_id,
     get_all_posts,
-    get_post_by_id,
     get_user_by_username,
-    insert_new_post,
 )
 
 

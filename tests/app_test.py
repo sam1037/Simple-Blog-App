@@ -1,6 +1,6 @@
 # TODO fix import and package man.
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 

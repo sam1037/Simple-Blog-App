@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import TypedDict
 
 
-
 class User(TypedDict):
     """
     represent a user obj from the db
