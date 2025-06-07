@@ -16,7 +16,7 @@ This is a Flask-based web application that implements a simple blog system with 
 - Database: PostgreSQL (hosted on Neon cloud platform)
 - Testing: pytest
 - Package Management: uv
-- Tools: GitHub Actions, Railway (hosting), Neon
+- Tools: GitHub Actions, Railway, Neon, Ruff
 
 ## Commands
 - `uv sync`: download the required packages
