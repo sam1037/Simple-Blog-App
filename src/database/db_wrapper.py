@@ -1,14 +1,18 @@
-'''This file act as an layer btw the application logic layer and the actual database, so all the queries happen here'''
+"""This file act as an layer btw the application logic layer and the actual database, so all the queries happen here"""
 
-from src.database.db import db_pool
-from psycopg2.extras import RealDictCursor
-import pytz
-from typing import TypedDict
-from src.database.models import User, Post
-from passlib.hash import bcrypt
 import logging
 
+import pytz
+from passlib.hash import bcrypt
+from psycopg2.extras import RealDictCursor
+
+from src.database.db import db_pool
+from src.database.models import Post, User
+
+# TODO maybe add a with_db_connection decorator
+
 my_logger = logging.getLogger("my_flask_logger")
+
 
 def add_user(username: str, password: str) -> None:
     """
@@ -17,34 +21,36 @@ def add_user(username: str, password: str) -> None:
     hashed_pw = bcrypt.hash(password)
 
     conn = db_pool.getconn()
-    query = "INSERT INTO users(username, hashed_pw) VALUES (%s, %s);"  
+    query = "INSERT INTO users(username, hashed_pw) VALUES (%s, %s);"
     try:
         with conn.cursor() as cursor:
             cursor.execute(query, (username, hashed_pw))
         conn.commit()
     except Exception as e:
         conn.rollback()
-        my_logger.error(f"Error adding user: {e}");
+        my_logger.error(f"Error adding user: {e}")
     finally:
         db_pool.putconn(conn)
+
 
 def check_if_username_exist_in_db(username: str) -> bool:
     """
     check if username exist in db, returns a bool indicating the result
     """
     conn = db_pool.getconn()
-    query = "SELECT 1 FROM users WHERE username = %s;"  
+    query = "SELECT 1 FROM users WHERE username = %s;"
     try:
         with conn.cursor() as cursor:
             cursor.execute(query, (username,))
             res = cursor.fetchone()
             return res is not None
     except Exception as e:
-        my_logger.error(f"Error checking if username taken: {e}");
+        my_logger.error(f"Error checking if username taken: {e}")
         return False
     finally:
         db_pool.putconn(conn)
     return False
+
 
 def get_user_by_username(username: str) -> User | None:
     """
@@ -63,6 +69,7 @@ def get_user_by_username(username: str) -> User | None:
         db_pool.putconn(conn)
     return None
 
+
 def get_all_posts() -> list[Post] | None:
     """
     get all the posts as a dictionary, sort by date from newest to oldest
@@ -74,17 +81,18 @@ def get_all_posts() -> list[Post] | None:
             cursor.execute(query)
             res = cursor.fetchall()
             # handle the res, add local time
-            hk_timezone = pytz.timezone('Asia/Hong_Kong')
+            hk_timezone = pytz.timezone("Asia/Hong_Kong")
             for post in res:
-                utc_time = post['date_posted']
+                utc_time = post["date_posted"]
                 hk_time = utc_time.replace(tzinfo=pytz.utc).astimezone(hk_timezone)
-                post['date_posted'] = hk_time.strftime('%Y-%m-%d %H:%M') 
+                post["date_posted"] = hk_time.strftime("%Y-%m-%d %H:%M")
             return res
     except Exception as e:
         my_logger.error(f"Error occured when getting all posts from db: {e}")
     finally:
         db_pool.putconn(conn)
-    
+
+
 def insert_new_post(author: str, title: str, content: str) -> bool:
     """
     insert a new post to db, return a Boolean indicating successful or not
@@ -102,6 +110,7 @@ def insert_new_post(author: str, title: str, content: str) -> bool:
         return False
     finally:
         db_pool.putconn(conn)
+
 
 def edit_post_by_id(post_id: int, title: str, content: str) -> bool:
     """
@@ -138,6 +147,7 @@ def get_post_by_id(post_id: int) -> Post | None:
     finally:
         db_pool.putconn(conn)
     return None
+
 
 def delete_post_by_id(post_id: int) -> bool:
     """

@@ -1,14 +1,12 @@
 import sys
 import os
-import pytest
 from unittest.mock import patch, MagicMock
 
 # Add the parent directory to the path so we can import the database modules
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.database.db_wrapper import (
-    add_user, get_user_by_username, check_if_username_exist_in_db,
-    get_all_posts, insert_new_post, get_post_by_id, delete_post_by_id
+    add_user, get_user_by_username, get_all_posts
 )
 
 # Use mocking to avoid actual database operations

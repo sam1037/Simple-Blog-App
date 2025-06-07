@@ -1,9 +1,10 @@
 ''' This file handles connection to the postgresql database and db table schemas.'''
 
-import psycopg2
 import os
 from dotenv import load_dotenv
 from psycopg2 import pool
+
+print("\n[!] db.py run [!]\n")
 
 # Load environment variables once
 load_dotenv()
@@ -56,7 +57,6 @@ def init_db() -> None:
 
 # init the db
 if __name__ == "__main__":
-    conn = db_pool.getconn()
     init_db()
     end_db_connection()
     #add_user("test", "pw")
