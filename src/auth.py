@@ -56,7 +56,7 @@ def login_required_api(f):
 
 # User login/logout
 # TODO change this to /login
-@bp.route("/", methods=["GET", "POST"])
+@bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         # get sent username and pw
