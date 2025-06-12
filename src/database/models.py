@@ -27,6 +27,7 @@ class Post(TypedDict):
     - title (str): Title of the blog post
     - content (str): Main content/body of the blog post
     - date_posted (datetime): Timestamp when the post was created
+    - like_count (int): Number of likes the post has
     """
 
     post_id: int
@@ -34,3 +35,16 @@ class Post(TypedDict):
     title: str
     content: str
     date_posted: datetime
+    like_count: int
+
+
+class UserLikePostRecord(TypedDict):
+    """
+    Represents a record of a user liking a post.
+
+    - user_id (int)
+    - post_id (int)
+    """
+
+    user_id: int
+    post_id: int

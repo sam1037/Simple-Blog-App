@@ -9,7 +9,8 @@ import click  # noqa: F401
 from flask import Flask, redirect, url_for
 
 
-def create_app():
+# TODO fix: no debug mode?
+def create_app() -> Flask:
     # app create and config
     app = Flask(__name__)
     SECRET_KEY = os.environ.get("SECRET_KEY")

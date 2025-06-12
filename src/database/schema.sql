@@ -11,3 +11,21 @@ CREATE TABLE IF NOT EXISTS posts (
   content TEXT,
   date_posted TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS user_likes (
+  user_id INT NOT NULL, 
+  post_id INT NOT NULL,
+  PRIMARY KEY (user_id, post_id),
+  CONSTRAINT fk_user
+    FOREIGN KEY (user_id)
+    REFERENCES users (user_id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_post
+    FOREIGN KEY (post_id)
+    REFERENCES posts (post_id)
+    ON DELETE CASCADE
+);
+
+CREATE INDEX idx_posts_author ON posts (author);
+CREATE INDEX idx_posts_date_posted ON posts (date_posted);
+CREATE INDEX idx_user_likes_post_id ON user_likes (post_id);
