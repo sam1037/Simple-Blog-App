@@ -6,15 +6,15 @@ Check it out [here](https://simple-blog-app-production.up.railway.app/)! (You ca
 This is a Flask-based web application that implements a simple blog system with the following features:
 
 - User authentication (login/logout and registration)
-- Create, read, update, and delete blog posts as logged-in user (CRUD operations)
+- CRUD: Create, read, update, and delete blog posts (login-required)
 - Guest mode: read blogs without logging in as guest
-- PostgreSQL database for data storage
+- Like/unlike a blog post (login-required)
 
 ## Tech Stack
 - Frontend: HTML/JS/CSS, Tailwind CSS
 - Backend: Python, Flask
 - Database: PostgreSQL (hosted on Neon cloud platform)
-- Testing: pytest
+- Testing: pytest, cProfile
 - Package Management: uv
 - Tools: GitHub Actions, Railway, Neon, Ruff
 
