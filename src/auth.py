@@ -66,6 +66,8 @@ def login():
         user_retrieved = db_wrapper.get_user_by_username(input_username)
         if user_retrieved and bcrypt.verify(input_pw, user_retrieved.get("hashed_pw")):
             session["username"] = input_username
+            session["user_id"] = user_retrieved.get("user_id")
+            my_logger.info(f"user id: {session['user_id']}")
             return redirect(url_for("blog.index"))
         flash("Login Error!", "error")
         return render_template("login.html")
@@ -74,7 +76,7 @@ def login():
 
 @bp.route("/logout")
 def logout():
-    session.pop("username", None)
+    session.clear()
     flash("Logout Successful!", "info")
     return redirect(url_for("auth.login"))
 

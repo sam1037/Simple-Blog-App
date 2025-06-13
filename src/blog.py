@@ -31,11 +31,35 @@ def index():
         return render_template("index.html", username=session["username"])
 
 
-# ??? this is actually an API route???
+# TODO: rename this, modify the get_posts api endpoint s.t. it returns a json containing a list of all the post and a list of post_id liked by current user
 @bp.route("/get_posts")
 def get_posts():
+    """
+    API endpoint to return a json containing a list of all the post and a list of posts liked by current user
+    """
+    user_id = session.get("user_id")
+    current_user_liked_post_ids: list[int] = []
+    if user_id:
+        current_user_liked_post_ids = db_wrapper.get_current_user_liked_post_ids(
+            user_id
+        )
+        my_logger.debug(f"current_user_liked_post_ids: {current_user_liked_post_ids}")
     posts = db_wrapper.get_all_posts()
-    return jsonify(posts)
+    my_logger.debug(f"post count: {len(posts)}")
+
+    res = jsonify(
+        {"posts": posts, "current_user_liked_post_ids": current_user_liked_post_ids}
+    )
+
+    return res
+
+
+@bp.route("/test", methods=["GET"])
+def test():
+    """
+    API endpoint to return a json containing a list of all the post and a list of posts liked by current user
+    """
+    return get_posts()
 
 
 # Create new post
@@ -110,3 +134,57 @@ def delete_post(post_id):
     if db_wrapper.delete_post_by_id(post_id):
         return jsonify({"message": "Post deleted successfully."})
     return jsonify({"message": "Error occured during post deletion"}), 404
+
+
+@bp.route("/like_post/<post_id>", methods=["POST"])
+# @profile_this_endpoint
+@login_required_api
+# TODO add type hint for the api endpoints
+def toggle_like_post(post_id):
+    """
+    API endpoint to like/ unlike a post (toggle), return json (message, new like count, liked by user) and HTTP status code
+    """
+
+    # validify post id and user id
+    user_id = session.get("user_id")
+    if user_id is None:
+        my_logger.error("Invalid user id")
+        return jsonify({"message": "Invalid user id"}), 400
+
+    post_with_like_status = db_wrapper.get_post_and_if_user_liked_it(user_id, post_id)
+    if post_with_like_status is None:
+        my_logger.error("Invalid post id")
+        return jsonify({"message": "Invalid post id"}), 400
+
+    # check if user liked the post already, modify db accordingly
+    prev_liked_by_current_user = post_with_like_status.get("user_liked")
+    new_like_count: int = post_with_like_status.get("like_count")
+    message: str
+
+    if prev_liked_by_current_user:  # if liked by current user, should unlike it
+        db_wrapper.undo_like_post(user_id, post_id)  # 0.129
+        message = "Unliked a post, should modify db successfully"
+        new_like_count -= 1
+    else:
+        db_wrapper.like_post(user_id, post_id)  # 0.129
+        message = "Liked a post, should modify db successfully"
+        new_like_count += 1
+
+    new_like_count = max(new_like_count, 0)
+
+    # return
+    res = (
+        jsonify(
+            {
+                "message": message,
+                "new_like_count": new_like_count,
+                "liked_by_user": not prev_liked_by_current_user,
+            }
+        ),
+        200,
+    )
+    my_logger.debug(
+        f"the 3 data returned by toggle_like_post: {message, new_like_count, not prev_liked_by_current_user}"
+    )
+    return res
+    # TODO test this
