@@ -135,7 +135,7 @@ function attachAllEventListeners() {
 
                 // update a particular like icon and like count
                 const svgIcon = btn_span.childNodes[1];
-                const likeCntSpanElement = btn_span.childNodes[3]; // TIL there is some invisible element for space
+                const likeCntSpanElement = btn_span.querySelector('.like-count'); // Use querySelector for robust selection
 
                 if (svgIcon && likeCntSpanElement) {
                     likeCntSpanElement.textContent = responseJson.new_like_count;
