@@ -1,4 +1,4 @@
-"""Util file providing ultilies functions"""
+"""Util file providing utilities functions"""
 
 import cProfile
 import io
