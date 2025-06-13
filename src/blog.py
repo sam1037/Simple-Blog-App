@@ -136,7 +136,8 @@ def delete_post(post_id):
     return jsonify({"message": "Error occured during post deletion"}), 404
 
 
-@bp.route("/like_post/<post_id>", methods=["POST", "GET"])
+@bp.route("/like_post/<post_id>", methods=["POST"])
+# @profile_this_endpoint
 @login_required_api
 # TODO add type hint for the api endpoints
 def toggle_like_post(post_id):
@@ -145,38 +146,45 @@ def toggle_like_post(post_id):
     """
 
     # validify post id and user id
-    post = db_wrapper.get_post_by_id(post_id=post_id)
     user_id = session.get("user_id")
-    if post is None or user_id is None:
-        my_logger.error("Invalid post id or user id")
-        # let's just return 400, don't wanna bother
-        return jsonify({"message": "Invalid post id or user id"}), 400
+    if user_id is None:
+        my_logger.error("Invalid user id")
+        return jsonify({"message": "Invalid user id"}), 400
+
+    post_with_like_status = db_wrapper.get_post_and_if_user_liked_it(user_id, post_id)
+    if post_with_like_status is None:
+        my_logger.error("Invalid post id")
+        return jsonify({"message": "Invalid post id"}), 400
 
     # check if user liked the post already, modify db accordingly
-    like_record = db_wrapper.get_user_like_post_record(user_id, post_id)
-    liked_by_user: bool
-    new_like_count: int = post.get("like_count")
+    prev_liked_by_current_user = post_with_like_status.get("user_liked")
+    new_like_count: int = post_with_like_status.get("like_count")
     message: str
 
-    if like_record is not None:  # unlike
-        db_wrapper.undo_like_post(user_id, post_id)
+    if prev_liked_by_current_user:  # if liked by current user, should unlike it
+        db_wrapper.undo_like_post(user_id, post_id)  # 0.129
         message = "Unliked a post, should modify db successfully"
-        liked_by_user = False
         new_like_count -= 1
-    else:  # like
-        db_wrapper.like_post(user_id, post_id)
+    else:
+        db_wrapper.like_post(user_id, post_id)  # 0.129
         message = "Liked a post, should modify db successfully"
-        liked_by_user = True
         new_like_count += 1
 
     new_like_count = max(new_like_count, 0)
 
     # return
-    return jsonify(
-        {
-            "message": message,
-            "new_like_count": new_like_count,
-            "liked_by_user": liked_by_user,
-        }
-    ), 200
+    res = (
+        jsonify(
+            {
+                "message": message,
+                "new_like_count": new_like_count,
+                "liked_by_user": not prev_liked_by_current_user,
+            }
+        ),
+        200,
+    )
+    my_logger.debug(
+        f"the 3 data returned by toggle_like_post: {message, new_like_count, not prev_liked_by_current_user}"
+    )
+    return res
     # TODO test this
