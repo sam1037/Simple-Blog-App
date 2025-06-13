@@ -7,7 +7,12 @@ from passlib.hash import bcrypt
 from psycopg2.extras import RealDictCursor
 
 from src.database.db import db_pool
-from src.database.models import Post, User, UserLikePostRecord
+from src.database.models import (
+    Post,
+    PostWithCurrentUserLikeStatus,
+    User,
+    UserLikePostRecord,
+)
 
 # TODO maybe add a with_db_connection decorator to abstract the repeating parts?
 
@@ -152,6 +157,49 @@ def edit_post_by_id(post_id: int, title: str, content: str) -> bool:
         my_logger.error(f"Error occured when inserting new post to db: {e}")
         conn.rollback()
         return False
+    finally:
+        db_pool.putconn(conn)
+
+
+def get_post_and_if_user_liked_it(
+    post_id: int, user_id: int
+) -> PostWithCurrentUserLikeStatus | None:
+    """
+    Return the post and if user has liked the post
+    """
+    conn = db_pool.getconn()
+    query = """
+        SELECT
+            p.post_id,
+            p.author,
+            p.title,
+            p.content,
+            p.date_posted,
+            COUNT(DISTINCT ul.user_id) AS like_count,
+            EXISTS (
+                SELECT 1
+                FROM user_likes ul_specific_user
+                WHERE ul_specific_user.post_id = p.post_id AND ul_specific_user.user_id = %s
+            ) AS user_liked
+        FROM
+            posts p
+        LEFT JOIN
+            user_likes ul ON p.post_id = ul.post_id
+        WHERE
+            p.post_id = %s
+        GROUP BY
+            p.post_id, p.author, p.title, p.content, p.date_posted;
+    """
+    try:
+        with conn.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute(query, (post_id, user_id))
+            post_data: PostWithCurrentUserLikeStatus = cursor.fetchone()  # type: ignore
+            if post_data:
+                return post_data
+            return None
+    except Exception as e:
+        my_logger.error(f"Error in get_post_and_if_user_liked_it: {e}")
+        return None
     finally:
         db_pool.putconn(conn)
 

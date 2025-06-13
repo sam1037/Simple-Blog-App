@@ -28,4 +28,4 @@ CREATE TABLE IF NOT EXISTS user_likes (
 
 CREATE INDEX idx_posts_author ON posts (author);
 CREATE INDEX idx_posts_date_posted ON posts (date_posted);
-CREATE INDEX idx_user_likes_post_id ON user_likes (post_id);
+CREATE INDEX idx_user_likes_user_post ON user_likes (user_id, post_id);
