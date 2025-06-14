@@ -46,6 +46,7 @@ async function fetchPosts() {
             <div class="text-sm text-gray-500 mb-2" style="clear: both;"> 
                 <span
                 data-post-id="${post.post_id}"
+                data-is-liked-by-cur-user="${isLikedByCurrentUser}"
                 class="
                     like-btn-span
                     hover:bg-gray-200
@@ -120,34 +121,76 @@ function attachAllEventListeners() {
     const likeBtns = document.querySelectorAll(".like-btn-span");
     likeBtns.forEach(btn_span => {
         btn_span.addEventListener("click", async()=> {
+            // setup
             const postId = btn_span.dataset.postId;
+            // console.log('%cis liked already:', 'font-weight: bold;');
+            // console.log(isLikedAlready)
+            const svgIcon = btn_span.querySelector('svg'); // More robust selector
+            const likeCntSpanElement = btn_span.querySelector('.like-count');
+
+            //time
             const timerLabel = `Like/Unlike Post ${postId}`; // Unique label for the timer
             console.time(timerLabel); // Start timing
             console.log(`like btn of post id ${postId} clicked!`);
-            
-            //call the api endpoint to toggle like/ dislike a post 
-            const response = await fetch(`/like_post/${postId}`, { method: 'POST', }); 
-            if (response.ok) {
-                //fetchPosts(); //turns out both approach has similar performance
 
-                const responseJson = await response.json()
-                console.log("Like/Unlike response:", responseJson);
-
-                // update a particular like icon and like count
-                const svgIcon = btn_span.childNodes[1];
-                const likeCntSpanElement = btn_span.querySelector('.like-count'); // Use querySelector for robust selection
-
-                if (svgIcon && likeCntSpanElement) {
-                    likeCntSpanElement.textContent = responseJson.new_like_count;
-                    svgIcon.setAttribute("fill", responseJson.liked_by_user ? "black" : "grey");
-                }
-
-            } else {
-                const errorData = await response.json()
-                console.log(errorData)
-                alert(errorData.message || "Somehow can't like/ dislike the post");
+            // validation
+            if (!svgIcon || !likeCntSpanElement) {
+                console.error("Could not find SVG icon or like count span for post:", postId);
+                console.timeEnd(timerLabel);
+                return;
             }
-            console.timeEnd(timerLabel);
+            
+            //save og state and new state
+            const originalLikeCount = parseInt(likeCntSpanElement.textContent, 10);
+            const originalFillColor = svgIcon.getAttribute("fill");
+            const isCurrentlyLiked = originalFillColor === "black";
+
+            const newOptimisticLikedState = !isCurrentlyLiked;
+            const newOptimisticLikeCount = newOptimisticLikedState ? originalLikeCount + 1 : Math.max(0, originalLikeCount - 1);
+
+            console.log(`new (optimistic like count: ${newOptimisticLikeCount}`)
+
+            // render the optimistic UI update
+            svgIcon.setAttribute("fill", newOptimisticLikedState ? "black": "grey");
+            likeCntSpanElement.textContent = newOptimisticLikeCount;
+
+            // console.timeEnd(timerLabel);
+            
+            // TODO how to write the HTTP request more elegantly?
+            //call the api endpoint to toggle like/ dislike a post 
+            try {
+                const response = await fetch(`/like_post/${postId}`, { method: 'POST', }); 
+                const responseJson = await response.json();
+                if (response.ok) {
+                    console.log("Response from /like_post/<post_id> endpoint ok")
+                    console.log("Like/Unlike response:", responseJson);
+
+                    // check if state differ, if so update
+                    if (responseJson.new_like_count !== newOptimisticLikeCount || responseJson.liked_by_user !== newOptimisticLikedState) {
+                        console.warn("Server state differs from optimistic update. Syncing UI with server.");
+                        likeCntSpanElement.textContent = responseJson.new_like_count;
+                        svgIcon.setAttribute("fill", responseJson.liked_by_user ? "black" : "grey");
+                    }
+                } else {
+                    // alert and console log
+                    console.log(responseJson)
+                    alert(responseJson.message || "Somehow can't like/ dislike the post");
+
+                    // Revert UI to original state
+                    likeCntSpanElement.textContent = originalLikeCount;
+                    svgIcon.setAttribute("fill", originalFillColor);
+                }
+            } catch (error) {
+                // Network error or other fetch-related issue, revert UI changes
+                console.error("Fetch error:", error);
+                alert("A network error occurred. Please try again.");
+
+                // Revert UI to original state
+                likeCntSpanElement.textContent = originalLikeCount;
+                svgIcon.setAttribute("fill", originalFillColor);
+            } finally {
+                console.timeEnd(timerLabel);    
+            }
         })
     })
 }
