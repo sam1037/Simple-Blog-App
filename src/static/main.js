@@ -57,6 +57,7 @@ async function fetchPosts() {
                     text-gray-600                             /* Adjust text/icon color if needed for contrast */
                     text-xs                                   /* Adjust text size if needed */
                     cursor-pointer
+                    select-none
                 "
                 style="float: right;"
                 >
